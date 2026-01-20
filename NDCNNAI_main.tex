@@ -1,0 +1,113 @@
+\documentclass[titlepage, a4paper, 12pt]{article}
+\usepackage[paper=a4paper, 
+            top=2.5cm, 
+            bottom=2.5cm, 
+            left=2cm, 
+            right=2cm, 
+            headheight=1.5cm, 
+            footskip=1.2cm]{geometry}
+
+\usepackage[utf8]{inputenc}          % Кодировка ввода
+\usepackage[T2A]{fontenc}            % Шрифты
+\usepackage[english, russian]{babel} % Корректная работа с английским и русским текстом
+
+\usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools} % Файлы американского математического сообщества
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{subfig}
+\usepackage{graphicx}
+\graphicspath{{fig/}}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{adjustbox}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lhead{\small Нелинейная динамика и управление нейронными сетями в ИИ}
+\chead{}
+\rhead{\small \thepage}
+
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
+\theoremstyle{definition}
+\newtheorem*{definition}{Определение}
+
+\theoremstyle{plain}
+\newtheorem*{theorem}{Теорема}
+\newtheorem*{lemma}{Лемма}
+\newtheorem*{corollary}{Следствие}
+\newtheorem*{proposition}{Предложение}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Замечание}
+\newtheorem*{remarks}{Замечания}
+\newtheorem*{example}{Пример}
+
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\essinf}{ess\,inf}
+
+\usepackage{subfiles}
+
+\begin{document}
+\begin{titlepage}
+  \title{Нелинейная динамика и управление нейронными сетями в искусственном интеллекте}
+  \author{конспект лекций}
+  \date{}
+  \maketitle
+\end{titlepage}
+
+\section*{Предисловие}
+Это конспект лекций по курсу <<Нелинейная динамика и управление нейронными сетями в искусственном интеллекте>>, прочитанному в осеннем семестре 2025 года Мокаевым Тимуром Назировичем для бакалавров 4 курса программы <<Прикладная математика, программирование и искусственный интеллект>> и магистров 2 курса <<Математического моделирования, программирования и искусственного интеллекта>> Санкт-Петербургского государственного университета.
+Текст был набран студентами по оригинальным презентациям с занятий, изначально подготовленным на английском языке, и исходным статьям (см. список в конце), поэтому может содержать опечатки и не совсем удачные переводы англоязычных терминов, для которых не был найден устоявшийся русский аналог, а также стилистически отличаться от темы к теме.
+\TeX-файлы находятся в открытом доступе на \hyperref{https://github.com/IKurkov/Nonlinear_dynamics_and_control_of_neural_networks_in_AI}{}{}{GitHub}{}.
+
+\tableofcontents
+\newpage
+\section{Биологические и искусственные нейроны. Исторический контекст искусственных нейронных сетей}
+\subfile{lections/lec1_1}
+\subfile{lections/lec1_2}
+\newpage
+
+\section{Функциональные пространства и универсальная аппроксимация}
+\subfile{lections/lec2_part1_1}
+\subfile{lections/lec2_part1_2}
+\subfile{lections/lec2_part1_3}
+\newpage
+
+\section{Классические теоремы об универсальной аппроксимации для функций в \textit{C} и $L^p$}
+\subfile{lections/lec2_part2_1}
+\subfile{lections/lec2_part2_2}
+\newpage
+
+\section{Универсальная аппроксимация для нелинейных операторов}
+\subfile{lections/lec3_1}
+\subfile{lections/lec3_2_UAT_for_functionals}
+\subfile{lections/lec3_3}
+\newpage
+
+\section{Generalized Translation Networks и их применение к задачам идентификации и управления}
+\subfile{lections/lec4_1_GTN}
+\subfile{lections/lec4_2_4models}
+\newpage
+
+\section{Функциональный многослойный перцептрон (FMLP)}
+\subfile{lections/lec5_1}
+\subfile{lections/lec5_2}
+\newpage
+
+\section{Deep Operator Networks (DeepONets) и роль глубины и ширины}
+\subfile{lections/lec6_1}
+\subfile{lections/lec6_2}
+\newpage
+
+\addcontentsline{toc}{section}{Список литературы}
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}

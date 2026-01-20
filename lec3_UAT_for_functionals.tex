@@ -1,0 +1,257 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[paper=a4paper, 
+            top=2.5cm, 
+            bottom=2.5cm, 
+            left=2cm, 
+            right=2cm, 
+            headheight=1.5cm, 
+            footskip=1.2cm]{geometry}
+
+\usepackage[utf8]{inputenc}          % Кодировка ввода
+\usepackage[T2A]{fontenc}            % Шрифты
+\usepackage[english, russian]{babel} % Корректная работа с английским и русским текстом
+
+\usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools} % Файлы американского математического сообщества
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lhead{\small Нелинейная динамика и управление нейронными сетями в ИИ}
+\chead{}
+\rhead{\small \thepage}
+
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
+\theoremstyle{definition}
+\newtheorem*{definition}{Определение}
+
+\theoremstyle{plain}
+\newtheorem*{theorem}{Теорема}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Замечание}
+\theoremstyle{remark}
+\newtheorem*{remarks}{Замечания}
+
+\theoremstyle{remark}
+\newtheorem*{example}{Пример}
+
+\begin{document}
+\section*{Лекция 3. Универсальная аппроксимация для нелинейных операторов}
+\subsection*{Равномерная универсальная аппроксимация наборов функций}
+\begin{definition}[Равномерная аппроксимация на $U$]
+  Пусть $K$ компактно и $U \subset C(K)$.
+  Последовательность отображений $A_m\colon U \to C(K)$ \emph{равномерно аппроксимирует тождественное отображение на $U$}, если
+  $$\lim_{m \to +\infty} \sup_{f \in U}\|A_m(f) - f\|_{C(K)} = 0.$$
+  С другой стороны мы можем говорить, что множество $\mathcal{H} \subset C(K)$ \emph{равномерно плотно в $U$}, если для каждого $\varepsilon > 0$ найдутся $h_1, \dots, h_N \in \mathcal{H}$ и непрерывные линейные функционалы $c_1, \dots, c_N\colon U \to \mathbb{R}$, такие что
+  $$\sup_{f \in U}\left\|f - \sum_{i = 1}^{N}c_i(f)h_i\right\|_{C(K)} \le \varepsilon.$$
+\end{definition}
+Ключевые идеи второго подхода: использование \underline{одинаковых} <<атомов>> $h_i$ для всех $f \in U$, от $f$ зависят только коэффициены $c_i(f)$, причём \underline{линейно и непрерывно}.
+Вооружившись этими понятиями, можем сформулировать теорему
+\begin{theorem}[Чен и Чен, теорема 3]
+  \label{thm:uat_compact}
+  Пусть $K \subset \mathbb{R}^n$ и $U \subset C(K)$ компактны, $g$ --- функция Таубера-Винера (TW, линейные комбинации её сдвигов и растяжений плотны в $C[a, b]$ для произвольных $a < b$).
+  Тогда для всякого $\varepsilon > 0$ существует $N \in \mathbb{N}$, набор параметров ${(w_i, \theta_i)}_{i=1}^N$ (независящие от $f \in U$) и непрерывные линейные функционалы $c_1, \dots c_N$, что
+  $$\sup_{f \in U}\sup_{x \in K} \left|f(x) - \sum_{i = 1}^{N}c_i(f)g(w_i \cdot x + \theta_i)\right| \le \varepsilon,$$
+  то есть аппроксимация на $U$ будет равномерной.
+\end{theorem}
+Для доказательства этого результата нам понадобится ряд инструментов и фактов:
+\begin{itemize}
+  \item \textbf{Продолжение Титца (Урысона):} Существует линейное непрерывное отображение $E\colon C(K) \to C(\mathbb{R}^n)$ со свойствами $(Ef)\big|_K = f$ и $\|Ef\|_\infty \le \|f\|_{C(K)}$.
+  Из последнего следует, что $U_1 \coloneq E(U)$ компактно в $C(\mathbb{R}^n)$.
+  \item \textbf{Нормализация:} Аффинными преобразованиями добьёмся, чтобы $K \subset Q = [-1, 1]^n$, это лишь приведёт к пересчёту частот $w_i$.
+  \item \textbf{Чётное 2-периодическое продолжение:} Определим $R\colon C(Q) \to C_{per}[-1, 1]^n$ как чётные 2-периодические продолжения по каждой координате.
+  Поскольку это движение на $Q$, $U^* \coloneq R(U_1\big|_Q)$ --- компакт.
+  \item \textbf{Аппроксимативная единица:} Пусть $S_R$ положительный, нормированный оператор тригонометрического суммирования, что для любой функции $f \in C_{per}[-1, 1]^n$ $\|S_Rf - f\|_\infty \xrightarrow[R \to +\infty]{} 0$.
+  Каждый оператор $S_R$ нормирован, из-за чего они образуют равностепенно непрерывное и равномерно ограниченное множество, то есть компактно по теореме Арцела-Асколи, на языке $\varepsilon$-сетей это значит
+  $$\forall \varepsilon > 0\,\exists R\colon \sup_{f \in U*}\|S_Rf - f\|_\infty < \frac{\varepsilon}{2}.$$
+  Нам будет важно представление в виде
+  $$(S_Rf)(x) = \sum_{\xi \in \Lambda_R}a_\xi(f)e^{i\xi \cdot x} = \sum_{\xi \in \Lambda_R}\alpha_\xi(f)\cos(\xi \cdot x) + \beta_\xi\sin(\xi \cdot x),$$
+  где $\Lambda_R\subset\mathbb{Z}^n$ --- конечно, а $a_\xi$, $\alpha_\xi$, $\beta_\xi$ линейны и непрерывны по $f$ (получены из коэффициентов Фурье).
+  Чтобы получить требуемые свойства, достаточно определить действие оператора $S_R$ как свёртку с \emph{аппроксимативной единицей} $\{K_R\}$, напомним, что это значит:
+  $$S_Rf := K_R * f; \quad K_R \in L^1(\mathbb{T}^n), \, K_R \ge 0, \, \int_{\mathbb{T}^n} K_R = 1, \, \int_{|y|>\delta} K_R(y) \, dy \xrightarrow[R \to \infty]{} 0.$$
+  Стандартным примером такого семейства функций, известного из гармонического анализа, являются \emph{средние Фейера}
+  $$F_N(t) = \frac{1}{N+1} \sum_{k=0}^{N} D_k(t) = \frac{1}{2\pi(N+1)} \left(\frac{\sin \frac{(N+1)t}{2}}{\sin \frac{t}{2}}\right)^2 \ge 0, \quad \int_{-\pi}^{\pi} F_N = 1.$$
+  Обобщение для $n$-мерного пространства происходит перемножением значений для каждой координаты (тут $R \sim N$):
+  $$F_N^{(n)}(x) = \prod_{j=1}^n F_N(x_j).$$
+  Другим классическим примером будут \emph{средние Бохнера-Рисса}, задаваемые для $\alpha > \frac{n-1}{2}$ через преобразование Фурье
+  $$m_R(\xi) = (1 - |\xi|^2 / R^2)_{+}^{\alpha}, \quad \widehat{{K_R}^\alpha} = m_R.$$
+  \item \textbf{Сведение к TW:} При фиксированном $\xi \in \mathbb{R}^n$, функции $x \mapsto \cos(\xi \cdot x)$, $\sin({\xi \cdot x})$ зависят лишь от одномерной переменной $t = \xi \cdot x$, что позволяет равномерно аппроксимировать на $Q$ каждую из них конечными суммами $g(w \cdot x + \theta)$.
+\end{itemize}
+Теперь перейдём к доказательству самой теоремы.
+\begin{proof}
+  Поскольку $U^* \subset C_{per}[-1, 1]^n$ компактно и $\{S_R\}$ равностепенно непрерывно и равномерно ограничено, существует $R \in \mathbb{N}$, что
+  $$\sup_{f \in U^*} \|S_R f - f\|_\infty < \frac{\varepsilon}{3}.$$
+  Запишем представление
+  $$(S_R f)(x) = \sum_{\xi \in \Lambda_R} \alpha_\xi(f) \cos(\xi \cdot x) + \beta_\xi(f) \sin(\xi \cdot x),$$
+  где $\Lambda_R$ конечное множество (набор <<частот>>) и отображения $f \mapsto \alpha_\xi(f)$, $\beta_\xi(f)$ являются линейными и непрерывными функционалами на $U^*$.
+  Положим $B \coloneq \sup_{f \in U^*} \|f\|_\infty < \infty$ и $C_R \coloneq \max_{\xi \in \Lambda_R} \|\alpha_\xi\| + \|\beta_\xi\|$, тогда  
+  $\sum_{\xi \in \Lambda_R} \left(|\alpha_\xi(f)| + |\beta_\xi(f)|\right) \le C_R B |\Lambda_R| \eqcolon \Gamma_R$.
+
+  Фиксируем $\delta > 0$ (уточним выбор позже).
+  Поскольку $g$ функция TW, значит найдутся такие линейные комбинации, что
+  $$\forall x \in Q\quad\left|\cos(\xi \cdot x) - \sum_{i=1}^N a_{i,\xi}^{(\cos)} g(w_i \cdot x + \theta_i)\right| \le \delta, \left|\sin(\xi \cdot x) - \sum_{i=1}^N a_{i,\xi}^{(\sin)} g(w_i \cdot x + \theta_i)\right| \le \delta.$$
+  Раз $\Lambda_R$ конечно, можем считать, что набор $\{(w_i, \theta_i)\}_{i=1}^N$ един для всех $\xi \in \Lambda_R$ (иначе возьмём объединение множеств для каждого $\xi$, по этой же причине для синуса и косинуса используются одинаковые частоты и сдвиги).
+  Важно, что $a_{i,\xi}^{(\cos)}$, $a_{i,\xi}^{(\sin)}$ зависят лишь от $\xi$ и фиксированного множества параметров, но не $f$.
+
+  Теперь определим приближение $g$-сетью для $f \in U^*$:
+  $$\mathcal{G}(f)(x) \coloneq \sum_{i=1}^{N} c_i(f) \underbrace{g(w_i \cdot x + \theta_i)}_{g_i(x)}, \quad c_i(f) \coloneq \sum_{\xi \in \Lambda_R} \alpha_\xi(f) a_{i,\xi}^{(\cos)} + \beta_\xi(f) a_{i,\xi}^{(\sin)}.$$
+  Каждый из $c_i(\cdot)$ является непрерывным линейным функционалом на $U^*$ как конечная сумма $\alpha_\xi(\cdot)$, $\beta_\xi(\cdot)$.
+
+  Фиксируем $x \in Q$ и $f \in U^*$, по неравенству треугольника
+  \begin{multline*}
+    |f(x) - \mathcal{G}(f)(x)| \le |f(x) - S_R f(x)| +\\
+    + \left|S_R f(x) - \sum_{\xi \in \Lambda_R} \alpha_\xi(f) \sum_{i = 1}^N a_{i,\xi}^{(\cos)} g_i(x) - \sum_{\xi \in \Lambda_R} \beta_\xi(f) \sum_{i = 1}^N a_{i,\xi}^{(\sin)} g_i(x)\right| \le \\
+    \le \frac{\varepsilon}{2} + \sum_{\xi \in \Lambda_R} \left(|\alpha_\xi(f)| + |\beta_\xi(f)|\right) \delta.
+  \end{multline*}
+  Выберем $\delta \coloneq \frac{\varepsilon}{2\Gamma_R}$, чтобы получить оценку
+  $$\sup_{f \in U^*} \|f - G(f)\|_{L^\infty(Q)} \le \frac{\varepsilon}{2} + \Gamma_R\frac{\varepsilon}{2\Gamma_R} = \varepsilon.$$
+
+  Осталось вернутся в исходное пространство, мы произвели цепочку преобразований $U \xrightarrow{E} U_1 \xrightarrow{R} U^*$, поэтому рассмотрим композицию $\mathcal{G}$ с $R \circ E$ и сузим всё на $K$:
+  $$\widetilde{\mathcal{G}}(f) \coloneq \mathcal{G}\left(R(Ef)\right) \big|_K = \sum_{i=1}^{N} c_i\left(R(Ef)\right) g(w_i \cdot x + \theta_i)\Big|_{x \in K}.$$
+  Поскольку $E$ и $R$ линейны и непрерывны и сужение не увеличит супремум норму, получаем желаемое неравенство
+  $$\sup_{f \in U} \sup_{x \in K} |f(x) - \widetilde{\mathcal{G}}(f)(x)| \le \varepsilon.$$
+  Параметры сети $\{(w_i, \theta_i)\}_{i=1}^{N}$ одинаковы для всех $f \in U$, каждое коэффициентное отображение $f \mapsto c_i\left(R(Ef)\right)$ представляет собой линейный непрерывный функционал на $U$.
+  Таким образом мы построили семейство нейронных сетей с единственным скрытым слоем, параметры которого фиксированы, и линейными выходами, обеспечивающего равномерную аппроксимацию на U.
+\end{proof}
+\newpage
+\begin{remarks}
+  \leavevmode
+  \begin{itemize}
+    \item Специфика выбора активационной функции $g$ (Таубера-Винера) сыграла лишь, когда мы приближали синусы и косинусы линейными комбинациями её сдвигов и растяжений.
+    В многомерной конструкции атомами аппроксимации становятся ridge-функции $x \mapsto g(w \cdot x + \theta)$.
+    \item <<Внешний>> тригонометрический слой кодирует поведение функции через $S_R$, а каждая гармоника приближается конечным ridge-представлением, что и приводит к конечной сети с единым скрытым слоем для всех $f \in U$.
+    \item Все подобранные значения ($R$, скрытые параметры и ошибка $\delta$) зависят лишь от компакта $U$, что делает их равномерными.
+  \end{itemize}
+\end{remarks}
+
+\subsection*{Универсальная аппроксимация для нелинейных функционалов}
+\begin{theorem}[Чен и Чен, теорема 4]
+  \label{thm:uat_nonlin}
+  Пусть $X$ является банаховым пространством, $K \subset X$ и $V \subset C(K)$ компактны, $f\colon V \to \mathbb{R}$ непрерывен и $g$ --- TW-функция.
+  Тогда для любого $\varepsilon > 0$ найдутся натуральные $N$, $m$, точки $x_1, \dots, x_m \in K$ и параметры $\{\theta_{ij}, \beta_i\}_{i=1,\dots,N}^{j=1,\dots,m}$, $\{c_i\}_{i=1}^N$ такие, что
+  $$\forall u \in V \quad \left|f(u) - \sum_{i=1}^N c_i g\left(\sum_{j=1}^m \theta_{ij} u(x_j) + \beta_i\right)\right| \le \varepsilon,$$
+  где \underline{внутренние} коэффициенты $\theta_{ij}$, $\beta_i$ и разбиение $\{x_j\}$ не зависят от $u$, а \underline{внешние} коэффициенты $c_i$ определяются $f$, но не $u$.
+\end{theorem}
+Для доказательства этого результата потребуются:
+\begin{itemize}
+  \item \textbf{Теорема Арцела-Асколи:} $V \subset C(K) \Rightarrow$ равностепенно непрерывно, а значит имеется общий модуль неперывности $\omega_V(\delta)$, что $|u(x) - u(y)| \le \omega_V(d(x,y))$ для любого $u \in V$.
+  \item \textbf{$\delta$-сети и разбиение единицы:} Для каждого $v > 0$ построим конечную сеть $N(v) = \{x_j^{(v)}\}_{j=1}^{m(v)} \subset K$ и соответствующее разбиение единицы $\{\tau_j^{(v)}\}$: $\sum_j \tau_j^{(v)} = 1$ и $\mathbf{supp}\tau_j^{(v)} \subset B\left(x_j^{(v)}, v\right)$.
+  \item \textbf{Конечномерный оператор (проецирования):} $(\Pi_v u)(x) \coloneq \sum_{j=1}^{m(v)} u(x_j^{(v)}) \tau_j^{(v)}(x)$, для него, по равностепенной непрерывности $V$, верно $\|\Pi_v u - u\|_{C(K)} \le \omega_V(v)$ равномерно по $u$.
+  \item \textbf{Предыдущая теорема об УА для компактных множеств.}
+\end{itemize}
+\begin{proof}
+  Фиксируем $\varepsilon > 0$, выберем $v > 0$ настолько малым, что
+  $$\forall u \in V \quad \|\Pi_v u - u\|_{C(K)} \le \omega_V (v) < \frac{\varepsilon}{2}.$$
+  Для краткости обозначим $m \coloneq m(v)$, $x_j \coloneq x_j^{(v)}$, $\tau_j \coloneq \tau_j^{(v)}$, $u_v \coloneq \Pi_v u = \sum_{j=1}^m u(x_j) \tau_j(\cdot)$.
+  Заметим, что отображение $T\colon V \to C(K)$, $T(u) = u_v$ зависит лишь от конечномерного вектора значений
+  $$u_M \coloneq \left(u(x_1), \dots, u(x_m)\right) \in \mathbb{R}^m,$$
+  причём линейно и непрерывно: $u_v = A(u_M)$, где $A(y)(x) = \sum_{j=1}^m y_j \tau_j(x)$.
+
+  Выделим подмножество $W = \{u_M : u \in V\} \subset \mathbb{R}^m$, оно является непрерывным образом компактного множества $V$, а значит тоже компактным.
+  Определим непрерывное отображение $\Phi = f \circ A \big|_W$.
+  Раз $f$ непрерывен и $V$ компактно, то он равномерно непрерывен, а значит, возможно уменьшая $v$, можем гарантировать
+  $$\forall u \in V \quad |f(u) - \Phi(u_M)| < \frac{\varepsilon}{2}.$$
+  Иными словами мы приблизили $f$ непрерывной функцией на компактном подмножестве $W \subset \mathbb{R}^m$.
+
+  Вспомним, что $g$ --- $TW$-функция, тогда применим предыдущую теорему для куба $K \supset W$ и функции $\Phi$.
+  Получим набор параметров $\{\theta_{ij}, \beta_i\}$ (не зависят от $y \in W$) и $\{c_i\}$ (зависят от $\Phi$), что
+  $$\forall y \in W \quad \left|\Phi(y) - \sum_{i=1}^{N} c_i g\left(\sum_{j=1}^{m} \theta_{ij} y_j + \beta_i\right)\right| \le \frac{\varepsilon}{2}.$$
+  Подставим $y = u_M$, тогда для всех $u \in V$
+  $$\left|\Phi(u_M) - \sum_{i=1}^{N} c_i g\left(\sum_{j=1}^{m} \theta_{ij} u(x_j) + \beta_i\right)\right| \le \frac{\varepsilon}{2}.$$
+  Осталось собрать всё воедино:
+  \begin{multline*}
+    \left|f(u) - \sum_{i=1}^{N} c_i g\left(\sum_{j=1}^{m} \theta_{ij} u(x_j) + \beta_i\right)\right| \le |f(u) - \Phi(u_M)| + \\
+    + \left|\Phi(u_M) - \sum_{i=1}^{N} c_i g\left(\sum_{j} \theta_{ij} u(x_j) + \beta_i\right)\right| \le \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
+  \end{multline*}
+  Это неравенство и природа коэффициентов заканчивает доказательство.
+\end{proof}
+\begin{remarks}
+  \leavevmode
+  \begin{itemize}
+    \item Достаточно непрерывности $f$ только на $V$.
+    \item Свойство $g$ (функция Таубера-Винера) позволило нам использовать теорему об УА на компактных множествах и приблизить $\Phi$ на $W \subset \mathbb{R}^m$.
+    \item Представление $u \mapsto \sum_{j=1}^{N} c_i g(\sum_{j=1}^{m} \theta_{ij}u(x_j) + \beta_i)$ --- \emph{нейронная сеть значений}, $u$ заменяется значениями в конечном наборе точек, которые аффинно преобразуются, подаются на вход $g$, а затем берётся их линейная комбинация.
+    \item Можно взглянуть на теорему динамически: поскольку вычисление значения функции в точке и совершение над ней какого-то преобразования коммутируют, и атомами приближения выступают всевозможные сдвиги и растяжения активационной функции Таубера-Винера, манипуляции над входом качественно не меняют структуру аппроксимации, а лишь приводят к пересчёту коэффициентов.
+    Детально про это пойдёт речь далее.
+  \end{itemize}
+\end{remarks}
+
+\subsection*{Связь динамических систем и аппроксимации нелинейных функционалов}  
+Чтобы увидеть связь теории динамических систем и предыдущей теоремы об аппроксимации нелинейных функционалов, нам потребуется такой аппарат курса алгебры, как \emph{действие группы на множестве}.
+Напомним, (полу-)группа $G$ действует на множестве $K$, если задано отображение (действие) $\cdot \colon G \times K \to K$, удовлетворяющее правилам:
+$$\mathbf{(i)}\,e \cdot x = x, \quad \mathbf{(ii)}\,(g_1g_2) \cdot x = g_1 \cdot (g_2 \cdot x).$$
+Типичные примеры: действие симметрической группы на конечном множестве, группы движений на евклидовом пространстве, непрерывного потока $\{\Phi_t\}_{t \in \mathbb{R}}$ на точки фазового пространства.
+Действие на множестве можно перенести на пространство функций, например так: для $u \in C(K)$ положим
+$$(g \cdot u)(x) \coloneq u(g^{-1} \cdot x), \quad g \in G, \, x \in K.$$
+Ключевую роль в дальнейших рассуждениях сыграют пара понятий, связанных с симметрией.
+Функционал $f\colon V \to \mathbb{R}$ ($V \subset C(K)$ --- компакт) называется \textbf{инвариантным}, если образ не зависит от действия на аргумент, то есть $f(g \cdot u) = f(u)$ для любого $g \in G$.
+Функционал $f$ --- \textbf{эквивариантен}, если $f(g \cdot u) = \rho(g)f(u)$\footnote{Прим. наборщика: с помощью $\rho\colon G \to \mathbb{C}$ задаётся действие $G$ на $\mathbb{R}$}. 
+
+\emph{Орбита} точки $x$ --- это множество всевозможных её образов $\mathrm{Orb}_G(x) \coloneq \{g \cdot x \colon g \in G\}$.
+Набор $X = \{x_j\}_{j=1}^m$ \emph{замкнут под действием} $G$, если он полностью состоит из орбит своих точек, то есть $X = \bigcup_{x \in X} \mathrm{Orb}_G(x)$.
+Такие множества обеспечивают \textbf{эквивариантность выборки (exact sampling equivariance)}.
+Пусть $L\colon C(K) \to \mathbb{R}^m$ вычисляет значения функции на $X$: $L(u) = (u(x_1), \ldots, u(x_m))$.
+Тогда для любого $g \in G$ найдётся матрица перестановок $P_g$, обеспечивающая тождество
+$$L(g \cdot u) = P_g L(u) \quad \mbox{или} \quad (P_g v)_j = v_i, x_i = g^{-1} \cdot x_j.$$
+Для некоторых групп такого конечно набора не найти (например группа вращений на сфере), в этом случае будем говорить о \textbf{приближённой эквивариантности выборки (approximate sampling equivariance)}.
+Пусть $X$ --- конечная $\delta$-сеть $K$, а $J \colon \mathbb{R}^m \to C(K)$ такой линейный оператора (можно использовать кусочно-линейные конечные элементы, разбиение единицы, RBF, сплайны), что
+$$\forall u \in V\, \|J \circ L(u) - u\|_{\infty} \le \eta(\delta), \quad \eta(\delta) \xrightarrow[\delta \to 0]{} 0.$$
+Тогда для $g \in G$ определим проекцию
+$$P_g \coloneq L \circ T_{g^{-1}} \circ J\colon \mathbb{R}^m \to \mathbb{R}^m, \quad (T_{g^{-1}} f)(x) \coloneq f(g^{-1}\cdot x)$$
+и получим равномерную на $V$ оценку
+$$\|L(g \cdot u) - P_g L(u)\|_\infty\footnote{Прим. наборщика: это выражение есть мера аппроксимации из общей схемы приближённых методов} \le \eta(\delta).$$
+
+Подадим на вход активационной функции сигнал $z_i(u) = \theta_i^T L(u) + \beta_i$, для удобства обозначим $h_i(u) = g(z_i(u))$.
+Если $\{\theta_i\}$ замкнуто относительно действия $G$, тогда
+$$h(g_0 \cdot u) = \Pi_{g_0} h(u)\,\mbox{($+O(\eta(\delta))$ в приближённом случае)},$$
+значит внешние коэффициенты могут быть спроецированы/усреднены, чтобы добиться инвариантности/эквивариантности с сохранением архитектуры и равномерной оценки погрешности.
+
+В теореме об \hyperref[thm:uat_compact]{УА на компактных множествах} атомами аппроксимации выступали ridge-функции $x \mapsto g(w \cdot x + \theta)$.
+Переносы $T_a\colon x \mapsto x + a$ и линейные отображения $A\colon x \mapsto Ax$ преобразуют их в
+$$g(w \cdot (x + a) + \theta) = g(w \cdot x + (\theta + w \cdot a)), \quad g(w \cdot (Ax) + \theta) = g((A^T w) \cdot x + \theta),$$
+то есть выполнено предположение о замкнутости, и работает предыдущее рассуждение.
+Предположим теперь, что функционал $f$ инвариантен, возьмём его приближение $A(u) = c^T h(u)$ из теоремы [], обеспечивающее $\sup_{u \in V} |A(u) - f(u)| \le \varepsilon$.
+По нему можем построить усреднённую модель
+$$\widetilde{A}(u) \coloneq \int_G A(g \cdot u) d\mu(g),$$
+тут $\mu$ --- нормированная мера Хаара на компактной хаусдорфовой топологической группе $G$ (то есть на $G$ введена топология, относительно которой умножение и взятие обратного непрерывны).
+Сделаем несколько наблюдений про неё:
+\begin{enumerate}
+  \item \emph{Инвариантность:} $\widetilde{A}(g_0 \cdot u) = \widetilde{A}(u)$ в силу инвариантности $\mu$.
+  \item \emph{Ошибка не ухудшилась:} $|\widetilde{A}(u) - f(u)| \le \int_G |A(g \cdot u) - f(g \cdot u)| d\mu(g) \le \varepsilon$.
+  \item \emph{Сохранение архитектуры:} $h(g \cdot u) = \Pi_g h(u) \Rightarrow \widetilde{A}(u) = \left(\int_G \Pi_g^T c\,d\mu(g)\right)^T h(u) \eqcolon \tilde{c}^T h(u)$, то есть просто проецируем $c$ на инвариантное подпространство $\{c\colon \Pi_g^T c = c\}$.
+\end{enumerate}
+Если $f$ эквивариантна ($f(g \cdot u) = \rho(g)f(u)$, $\rho\colon G \to \mathbb{C}$), положим
+$$\tilde{A}_\rho(u) \coloneq \int_{G} \rho(g)^{-1} A(g \cdot u) \, d\mu(g).$$
+Для такой модели выполнено:
+\begin{enumerate}
+  \item \emph{Эквивариантность:} $\tilde{A}_\rho(g_0 \cdot u) = \rho(g_0)$.
+  \item \emph{Ошибка не ухудшилась:} $|\widetilde{A}_\rho(u) - f(u)| \le \varepsilon$ (если $|\rho(g)| = 1$).
+  \item \emph{Сохранение архитектуры:} $\tilde{A}_{\rho}(u) = (\int_{G} \rho(g)^{-1} \Pi_g c \, d\mu(g))^T h(u) \eqcolon \tilde{c}_\rho^T h(u)$.
+\end{enumerate}
+
+\begin{example}[Дискретные сдвиги на прямой]
+  Возьмём $K = \mathbb{T}$, $G = \mathbb{Z}/M\mathbb{Z}$ действует сдвигами $\Phi_a(\cdot) = \cdot + a$, шаг $\Delta = \frac{2\pi}{M}$, разбиение $x_j = j\Delta$.
+  Тогда
+  $$L(\Phi_a \cdot u) = P_a L(u), \quad P_a = \mbox{циклический сдвиг}, \quad h(\Phi_a \cdot u) = \Pi_a h(u).$$
+  В случае инвариантного функционала усреднённые веса имеют вид
+  $$\widetilde{c} = \frac{1}{M} \sum_{a=0}^{M-1} \Pi_a^T c.$$
+  Для эквивариантности по модулю $m$ возьмём $\rho(a) = e^{ima\Delta}$, получим
+  $$\widetilde{c}_\rho = \frac{1}{M} \sum_{a=0}^{M-1} e^{-ima\Delta} \Pi_a^T c,$$
+  то есть дискретное преобразование Фурье, что обеспечивает все интересующие свойства.
+\end{example}
+Подводя итог, приведём рецепт получения симметрии модели из теоремы об \hyperref[thm:uat_nonlin]{универсальной аппроксимации для нелинейных функционалов}:
+\begin{enumerate}
+  \item Выбрать $X$ как объединение $G$-орбит или плотное как подмножество + линейное интерполирование.
+  \item Обучить модель из теоремы $A(u) = c^T h(u)$ до точности $\varepsilon$ на $V$.
+  \item Спроецировать веса: $\tilde{c} = \int_G \Pi_g^\top c \, d\mu(g)$ для инвариантности и $\tilde{c}_p = \int_G \rho(g)^{-1} \Pi_g^\top c \, d\mu(g)$ для эквивариантности.
+  \item Использовать в модели $\tilde{c}$ или $\tilde{c}_\rho$, при этом на $V$ ошибка не увеличивается.
+\end{enumerate}
+
+
+\end{document}

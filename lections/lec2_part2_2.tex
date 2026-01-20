@@ -1,0 +1,377 @@
+\documentclass[../NDCNNAI_main.tex]{subfiles}
+\graphicspath{{\subfix{../fig/}}}
+
+\begin{document}
+
+% \subsection*{1. Постановка задачи и основные обозначения}
+
+% \textbf{Обозначения:}
+% \begin{itemize}
+%     \item $X \subseteq \mathbb{R}^k$ --- область определения (компакт $K$ для равномерной аппроксимации, или $X = \mathbb{R}^k$ с конечной мерой $\mu$)
+%     \item $C(K)$ --- пространство непрерывных функций с нормой $\|f\|_\infty = \sup_{x \in K} |f(x)|$
+%     \item $L^p(\mu)$ --- пространство функций с конечной $p$-нормой: 
+%           $\|f\|_{p,\mu} = \left(\int_{\mathbb{R}^k} |f(x)|^p d\mu(x)\right)^{1/p}$
+%     \item $\mathcal{N}_\sigma = \left\{x \mapsto \sum_{j=1}^m \alpha_j \sigma(w_j \cdot x + b_j): m \in \mathbb{N}, \alpha_j \in \mathbb{R}, w_j \in \mathbb{R}^k, b_j \in \mathbb{R}\right\}$
+% \end{itemize}
+
+\subsection{Теорема Хорника (1991): универсальная аппроксимация в $L^p(\mu)$}
+
+\begin{theorem}[Hornik, 1991]
+Если $\sigma\colon \mathbb{R} \to \mathbb{R}$ --- ограниченная и непостоянная функция, то для любой конечной меры $\mu$ на $\mathbb{R}^k$ и любого $1 \leq p < \infty$, класс $\mathcal{N}_\sigma$ плотен в $L^p(\mu)$.
+\end{theorem}
+
+Перед этим приведём доказательство раннее озвученной \hyperref[lem:hornik]{леммы Хорника}.
+
+\begin{proof}[Доказательство леммы]
+\leavevmode
+\textbf{1. Сведение к одномерному случаю:}
+
+Фиксируем направление $u \in \mathbb{R}^k$ и определим выталкивающую меру (pushforward measure) $\alpha_u$ на $\mathbb{R}$:
+\[
+\alpha_u(B) = \alpha(\{x \in \mathbb{R}^k\colon u \cdot x \in B\}) \quad \text{для борелевских } B \subset \mathbb{R}.
+\]
+Для любой ограниченной измеримой функции $Z\colon \mathbb{R} \to \mathbb{R}$:
+\[
+\int_{\mathbb{R}^k} Z(u \cdot x) d\alpha(x) = \int_{\mathbb{R}} Z(t) d\alpha_u(t).
+\]
+Из условий леммы следует, что для всех $\lambda, \theta \in \mathbb{R}$:
+\[
+\int_{\mathbb{R}} \sigma(\lambda t - \theta) d\alpha_u(t) = 0.
+\]
+
+\noindent
+\textbf{2. Выбор сглаживающей функции:}
+
+Выберем $w \in L^1(\mathbb{R})$ с ненулевым преобразованием Фурье (например, $w(t) = e^{-t^2}$). Рассмотрим свёртку:
+\[
+h = w * \alpha_u \in L^1(\mathbb{R}),
+\]
+её преобразование Фурье: $\widehat{h}(\omega) = \widehat{w}(\omega) \widehat{\alpha_u}(\omega)$.
+
+\noindent
+\textbf{3. Аннулирование сдвигами и растяжениями:}
+
+Из условия $\int_{\mathbb{R}} \sigma(\lambda t - \theta) d\alpha_u(t) = 0$ и свойства свёртки следует:
+\[
+\int_{\mathbb{R}} \sigma(t) h(\alpha t - \gamma) dt = 0 \quad \forall \alpha \neq 0, \gamma \in \mathbb{R}.
+\]
+Это означает, что линейный функционал $L(f) = \int_{\mathbb{R}} \sigma(t) f(t) dt$ аннулирует все функции вида $h(\alpha t - \gamma)$.
+
+\noindent
+\textbf{4. Анализ замкнутого подпространства:}
+Рассмотрим замкнутое инвариантное относительно сдвигов и растяжений подпространство:
+\[
+I_h = \overline{\text{span}}\{h(\alpha \cdot - \gamma): \alpha \neq 0, \gamma \in \mathbb{R}\} \subset L^1(\mathbb{R}).
+\]
+Это идеал в $L^1(\mathbb{R})$. Его нулевое множество (zero set):
+\[
+Z(I_h) = \{\omega \in \mathbb{R}\colon \widehat{f}(\omega) = 0 \ \forall f \in I_h\}.
+\]
+Так как $\widehat{h}(0) = \int_{\mathbb{R}} h(t) dt = \int_{\mathbb{R}} d(w * \alpha_u)(t) = 0$ (из условия при $\lambda = 0$), и $\widehat{h}(\omega/\alpha) = \alpha \widehat{h}(\omega)$ для растяжений, то $Z(I_h) = \{0\}$.
+
+\noindent
+\textbf{5. Применение теоремы Таубера-Винера:}
+
+По теореме Винера (Rudin, Fourier Analysis on Groups), единственный замкнутый идеал в $L^1(\mathbb{R})$ с $Z(I) = \{0\}$ --- это множество функций с нулевым средним:
+\[
+I_h = \left\{f \in L^1(\mathbb{R})\colon \int_{\mathbb{R}} f(t) dt = 0\right\}.
+\]
+
+\noindent
+\textbf{6. Вывод о постоянстве $\sigma$:}
+
+Так как $L(f) = 0$ для всех $f \in I_h$, то в частности для любой $f \in L^1(\mathbb{R})$ с $\int f = 0$ имеем $\int \sigma f = 0$. Это означает, что функционал $L$ зависит только от среднего значения:
+\[
+\exists c \in \mathbb{R}: \int_{\mathbb{R}} \sigma(t) f(t) dt = c \int_{\mathbb{R}} f(t) dt \quad \forall f \in L^1(\mathbb{R}).
+\]
+Следовательно, $\sigma(t) = c$ почти всюду --- противоречие с непостоянностью $\sigma$.
+
+\noindent
+\textbf{7. Завершение доказательства:}
+
+Таким образом, $h = 0$, значит $\widehat{\alpha_u} = 0$ (так как $\widehat{w}$ не обращается в ноль). По теореме единственности для преобразования Фурье мер $\alpha_u = 0$ для всех $u \in \mathbb{R}^k$.
+Наконец, преобразование Фурье меры $\alpha$:
+\[
+\widehat{\alpha}(u) = \int_{\mathbb{R}^k} e^{i u \cdot x} d\alpha(x) = \int_{\mathbb{R}} e^{i t} d\alpha_u(t) = 0 \quad \forall u \in \mathbb{R}^k.
+\]
+Следовательно, $\alpha = 0$.
+\end{proof}
+
+Теперь, следуя оригинальной статье, докажем саму теорему.
+
+\begin{proof}[Доказательство теоремы Хорника]
+Проведём рассуждение поэтапно.\\
+\textbf{1. Предположение противного:} Пусть $\overline{\mathcal{N}_\sigma}^{L^p(\mu)} \neq L^p(\mu)$.\\
+\textbf{2. Разделяющий функционал:} По теореме Хана-Банаха существует ненулевой непрерывный линейный функционал $\Lambda \in (L^p(\mu))^*$, аннулирующий $\mathcal{N}_\sigma$.\\
+\textbf{3. Представление функционала:} По теореме об представлении $(L^p)^* \cong L^q(\mu)$ ($1/p + 1/q = 1$), существует $g \in L^q(\mu)$, $g \neq 0$, такой что
+\[
+\Lambda(f) = \int_{\mathbb{R}^k} f(x) g(x) d\mu(x) \quad \forall f \in L^p(\mu).
+\]
+\textbf{4. Мера, аннулирующая $\sigma$:} Определим конечную знаковую меру $\alpha$: $d\alpha(x) = g(x) d\mu(x)$. Тогда
+\[
+\int_{\mathbb{R}^k} \sigma(w \cdot x + b) d\alpha(x) = 0 \quad \forall w \in \mathbb{R}^k, b \in \mathbb{R}.
+\]
+\textbf{5. Применение леммы о дискриминативности:} По лемме 1, $\alpha = 0$, значит $g = 0$ п.в. --- противоречие с $g \neq 0$.\\
+\textbf{6. Вывод:} Следовательно, $\mathcal{N}_\sigma$ плотно в $L^p(\mu)$.
+\end{proof}
+
+\begin{corollary}[Равномерная аппроксимация на компактах]
+Если $\sigma$ непрерывна, ограничена и непостоянна, то для любого компакта $K \subset \mathbb{R}^k$ класс $\mathcal{N}_\sigma$ плотен в $C(K)$ относительно равномерной нормы.
+\end{corollary}
+
+\subsection{Гладкая аппроксимация (Хорник-Стинчкомб-Уайт, 1990)}
+
+\begin{theorem}[Хорник-Стинчкомб-Уайт, 1990]
+Пусть $\sigma \in C^m(\mathbb{R})$ ограничена вместе со своими производными до порядка $m$. Тогда:
+\begin{enumerate}
+    \item $\mathcal{N}_\sigma$ равномерно $m$-плотен на компактах в $C^m(\mathbb{R}^k)$
+    \item $\mathcal{N}_\sigma$ плотен в весовых пространствах Соболевского типа $C^{m,p}(\mu)$ для конечной меры $\mu$
+\end{enumerate}
+\end{theorem}
+Проясним понятия, встретившиеся в формулировке данного утверждения.
+
+\begin{definition}[$l$-конечная функция]
+Функция $\sigma$ называется \emph{$l$-конечной}, если $\sigma \in C^l(\mathbb{R})$ и $0 < \int_{\mathbb{R}} |D^l \sigma(t)| dt < \infty$.
+\end{definition}
+
+\begin{lemma}[Построение гладкой функции из $\sigma$]
+Если $\sigma$ $l$-конечна, то для любого $0 \leq m \leq l$ существует $H \in S^m_1(\mathbb{R}, \lambda)$ (пространство Соболева), $H \neq 0$, такая что $\Sigma(H) \subset \Sigma(\sigma)$.
+\end{lemma}
+
+\begin{proof}[Схема доказательства]
+Используется конструкция конечных разностей. Для фиксированного $a > 0$ определим оператор $\Delta_a$:
+\[
+\Delta_a f(x) = f(x+a) - f(x).
+\]
+Результат его итераций: $\Delta_a^n f(x) = \sum_{j=0}^n (-1)^{n-j} \binom{n}{j} f(x + ja)$.
+
+Если $\sigma$ $l$-конечна, то можно показать, что $\Delta_a^l \sigma \in S^m_1(\mathbb{R}, \lambda)$ для $m \leq l$.
+\end{proof}
+
+Помимо этого нам потребуется специальное интегральное представление также известное, как метод Ири-Мияке.
+
+\begin{lemma}[Интегральное представление]
+Пусть $G \in S^m_1(\mathbb{R}, \lambda)$, $G \neq 0$. Тогда для любой $f \in C^\infty_c(\mathbb{R}^k)$ (гладкие финитные функции) и любого мультииндекса $|\alpha| \leq m$:
+\[
+D^\alpha f(x) = \iint_{\mathbb{R} \times \mathbb{R}} a^\alpha D^\alpha G(a \cdot x - \theta) K(a, \theta) da d\theta,
+\quad \text{где} \quad
+K(a, \theta) = \frac{|b| \widehat{f}(ba) e^{2\pi i b\theta}}{\widehat{G}(b)}
+\]
+для некоторого $b \neq 0$ с $\widehat{G}(b) \neq 0$.
+\end{lemma}
+
+\begin{proof}[Идея доказательства]
+Используется формула обращения преобразования Фурье и свойства свертки.
+\end{proof}
+
+Интегралы же мы будем приближать римановыми суммами по следующей лемме.
+\begin{lemma}[Аппроксимация конечными суммами]
+Для компакта $K \subset \mathbb{R}^k$ и $\varepsilon > 0$ существуют конечные наборы параметров $\{(a_i, \theta_i, \beta_i)\}_{i=1}^N$ такие что
+\[
+\left\| D^\alpha f(x) - \sum_{i=1}^N \beta_i a_i^\alpha D^\alpha G(a_i \cdot x - \theta_i) \right\|_{L^\infty(K)} < \varepsilon.
+\]
+\end{lemma}
+
+\begin{proof}
+\textbf{1. Усечение области интегрирования:} Выбираем $M > 0$ так, чтобы
+\[
+\int_{|a|>M} \int_{|\theta|>\gamma M} |a^\alpha D^\alpha G(a \cdot x - \theta) K(a, \theta)| da d\theta < \varepsilon/2.
+\]
+\textbf{2. Равномерная непрерывность:} На компактной области $[-M, M] \times [-\gamma M, \gamma M]$ подынтегральная функция равномерно непрерывна.\\
+\textbf{3. Римановы суммы:} Разбиваем область на мелкие ячейки и заменяем интеграл суммой:
+\[
+S_N(x) = \sum_{i=1}^N \beta_i a_i^\alpha D^\alpha G(a_i \cdot x - \theta_i).
+\]
+При достаточно мелком разбиении $\|D^\alpha f - S_N\|_{L^\infty(K)} < \varepsilon$.
+\end{proof}
+
+Теперь перейдём к самой обоснованию теоремы Хорника-Стинчкомба-Уайта.
+
+\begin{proof}
+\textbf{1. Случай $G \in S^m_1(\mathbb{R}, \lambda)$:} Из последних двух лемм непосредственно следует, что $\Sigma(G)$ $m$-равномерно плотен на компактах в $C^\infty_c(\mathbb{R}^k)$, а значит и в $C^m(\mathbb{R}^k)$.
+
+\textbf{2. Сведение к $l$-конечным функциям:} По лемме, если $\sigma$ $l$-конечна ($l \geq m$), то существует $H \in S^m_1(\mathbb{R}, \lambda)$ с $\Sigma(H) \subset \Sigma(\sigma)$. Следовательно, $\Sigma(\sigma)$ также обладает свойством аппроксимации.
+
+\textbf{3. Пространства Соболева:} Для $f \in C^{m,p}(\mu)$ с компактным носителем $K$:
+\[
+\|f - g\|_{m,p,\mu} \leq \mu(K)^{1/p} \|f - g\|_{m,K}.
+\]
+Аппроксимируем $f$ функцией $g \in \mathcal{N}_\sigma$ с малой $m$-нормой на $K$.
+
+\textbf{4. Общий случай меры $\mu$:} Если $\mu$ не имеет компактного носителя, используем покрытие $\mathbb{R}^k$ компактами $K_n$ и строим аппроксимации на каждом $K_n$, контролируя хвостовую ошибку.
+\end{proof}
+
+\subsection{Теорема Лешно-Лин-Пинкуса-Шоккена (1993)}
+
+\begin{theorem}[LLPS, $L^p$ вариант]
+Пусть $\sigma \in L^\infty_{\text{loc}}(\mathbb{R})$ кусочно непрерывна и меры Лебега множества точек разрыва нулевая. Положим
+\[
+\Sigma_n = \operatorname*{span}\{\sigma(w \cdot x + \theta): w \in \mathbb{R}^n, \theta \in \mathbb{R}\}.
+\]
+Тогда $\Sigma_n$ плотно в $C(\mathbb{R}^n)$ (равномерно на компактах) \textbf{тогда и только тогда}, когда $\sigma$ не является полиномом почти всюду.
+\end{theorem}
+
+\begin{proof}
+$(\Rightarrow)$
+Если $\sigma$ --- полином степени $k$, то любая функция $\sigma(w \cdot x + \theta)$ --- полином степени $\leq k$. Следовательно, $\Sigma_n$ содержится в конечномерном пространстве полиномов степени $\leq k$, которое не может быть плотным в бесконечномерном пространстве $C(\mathbb{R}^n)$.
+
+$(\Leftarrow)$
+\textbf{Шаг 1: Сведение к одномерному случаю}
+
+\begin{lemma}[Плотность ridge-функций]
+Пространство $V = \text{span}\{f(a \cdot x)\colon a \in \mathbb{R}^n, f \in C(\mathbb{R})\}$ плотно в $C(\mathbb{R}^n)$.
+\end{lemma}
+
+\begin{proof}
+Следует из работ Vostrecov-Kreines (1961) и Dahmen-Micchelli (1987).
+\end{proof}
+
+Из этой леммы следует, что если $\Sigma_1$ плотно в $C(\mathbb{R})$, то $\Sigma_n$ плотно в $C(\mathbb{R}^n)$.
+
+\noindent
+\textbf{Шаг 2: Сглаживание свёрткой}
+
+Для $\varphi \in C^\infty_c(\mathbb{R})$ определим свёртку:
+\[
+(\sigma * \varphi)(x) = \int_{\mathbb{R}} \sigma(x-y) \varphi(y) dy.
+\]
+
+\begin{lemma}
+Для любого $\varphi \in C^\infty_c(\mathbb{R})$, функция $\sigma * \varphi$ принадлежит замыканию $\overline{\Sigma}_1$ (в топологии равномерной сходимости на компактах).
+\end{lemma}
+
+\begin{proof}[Ключевые конструкции]
+\textbf{1. Римановы суммы:} Зафиксируем $\operatorname*{supp} \varphi \subset [-A, A]$. Аппроксимируем интеграл суммой:
+\[
+S_N(x) = \sum_{i=1}^N \sigma(x - y_i) \varphi(y_i) \Delta y_i,
+\]
+где $-A = y_1 < y_2 < \dots < y_N = A$, $\Delta y_i = y_{i+1} - y_i = 2A/N$.
+
+\textbf{2. Оценка погрешности:} Разность
+\[
+|(\sigma * \varphi)(x) - S_N(x)| \leq \sum_{i=1}^N \int_{y_i}^{y_{i+1}} |\sigma(x-y) - \sigma(x-y_i)| |\varphi(y)| dy.
+\]
+
+\textbf{3. Разделение на <<хорошие>> и <<плохие>> интервалы:}
+Интервал будет \emph{хорошим}, если $\sigma$ равномерно непрерывна на $[x-y_{i+1}, x-y_i]$, то
+\[
+|\sigma(x-y) - \sigma(x-y_i)| \leq \omega(2A/N),
+\]
+где $\omega$ --- модуль непрерывности.
+\emph{Плохими} будут интервалы, содержащие точки разрыва $\sigma$. По условию, мера множества точек разрыва нулевая, поэтому суммарная длина таких интервалов мала при мелком разбиении.
+
+\textbf{4. Равномерная оценка:} При $N \to \infty$ погрешность стремится к 0 равномерно на компактах.
+\end{proof}
+
+\noindent
+\textbf{Шаг 3: Анализ сглаженных функций}
+
+\begin{lemma}
+Если для некоторого $\varphi \in C^\infty_c(\mathbb{R})$ функция $\sigma * \varphi$ не является полиномом, то $\Sigma_1$ плотно в $C(\mathbb{R})$.
+\end{lemma}
+
+\begin{proof}
+\textbf{1.} По ранее озвученной лемме, $\sigma * \varphi \in \overline{\Sigma}_1$.\\
+\textbf{2.} Так как $(\sigma * \varphi)(wx + \theta) \in \overline{\Sigma_1}$ для всех $w, \theta$, то $\overline{\Sigma_1}$ содержит все сдвиги и растяжения $\sigma * \varphi$.\\
+\textbf{3.} Если $\sigma * \varphi$ не полином, то её производные (которые также лежат в $\overline{\Sigma_1}$ через разностные отношения) порождают все полиномы.\\
+\textbf{4.} По теореме Вейерштрасса, полиномы плотны в $C(\mathbb{R})$.
+\end{proof}
+
+\noindent
+\textbf{Шаг 4: Случай, когда все свёртки --- полиномы}
+
+\begin{lemma}[Теорема Бэра о категории]
+Если $\sigma * \varphi$ --- полином для всех $\varphi \in C^\infty_c(\mathbb{R})$, то существует $m \in \mathbb{N}$ такое, что все $\sigma * \varphi$ --- полиномы степени $\leq m$.
+\end{lemma}
+
+\begin{proof}
+\textbf{1.} Рассмотрим пространство $C^\infty_c([a,b])$ с метрикой
+\[
+\rho(\varphi_1, \varphi_2) = \sum_{n=0}^\infty 2^{-n} \frac{\|\varphi_1 - \varphi_2\|_n}{1 + \|\varphi_1 - \varphi_2\|_n},
+\]
+где $\|\varphi\|_n = \sum_{j=0}^n \sup_{x \in [a,b]} |\varphi^{(j)}(x)|$.\\
+\textbf{2.} Множества $V_k = \{\varphi \in C^\infty_c([a,b])\colon \deg(\sigma * \varphi) \leq k\}$ замкнуты.\\
+\textbf{3.} По условию, $\bigcup_{k=0}^\infty V_k = C^\infty_c([a,b])$.\\
+\textbf{4.} По теореме Бэра, некоторое $V_m$ содержит внутреннюю точку. Так как $V_m$ --- линейное подпространство, то $V_m = C^\infty_c([a,b])$.
+\textbf{5.} Аргумент распространяется на все компактные интервалы.
+\end{proof}
+
+\begin{lemma}[Теория распределений]
+Если $\sigma * \varphi$ --- полином степени $\leq m$ для всех $\varphi \in C^\infty_c(\mathbb{R})$, то $\sigma$ --- полином степени $\leq m$ почти всюду.
+\end{lemma}
+
+\begin{proof}
+Из условия следует, что для всех $\varphi \in C^\infty_c(\mathbb{R})$:
+\[
+\int_{\mathbb{R}} \sigma(x-y) \varphi^{(m+1)}(y) dy = 0.
+\]
+В терминах распределений: $\sigma * \varphi^{(m+1)} = 0$. По свойствам свертки, это означает, что распределенная производная $D^{m+1}\sigma = 0$, следовательно $\sigma$ --- полином степени $\leq m$.
+\end{proof}
+
+\noindent
+\textbf{Шаг 5: Завершение доказательства}\\
+Если $\sigma$ не полином, то по последней лемме существует $\varphi \in C^\infty_c(\mathbb{R})$ такая, что $\sigma * \varphi$ не полином. По лемме из шага 3, $\Sigma_1$ плотно в $C(\mathbb{R})$. По лемме 5, $\Sigma_n$ плотно в $C(\mathbb{R}^n)$.
+\end{proof}
+
+\begin{remark}[О необходимости порога (смещения)]
+Без порога $\theta$ теорема LLPS неверна. Порог необходим для получения полноты системы сдвигов $\{\sigma(\cdot + \theta)\}$.
+\end{remark}
+
+\begin{example}
+Рассмотрим $\sigma(x) = \sin x$ без порога. Множество $\{\sin(w \cdot x)\colon w \in \mathbb{R}^n\}$ состоит только из нечётных функций. Чётная функция $\cos x$ на $[-1, 1]$ не может быть равномерно аппроксимирована линейными комбинациями нечётных функций.
+
+С добавлением порога: $\sin(x + \pi/2) = \cos x$, что позволяет аппроксимировать чётные функции.
+\end{example}
+
+\subsection{Сравнительный анализ условий на активационные функции}
+
+
+\begin{center}
+\small 
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Теорема} & \textbf{Требования к $\sigma$} & \textbf{Пространство} & \textbf{Условие полноты} \\
+\hline
+Cybenko (1989) & Непрерывная сигмоидальная & $C(K)$ & Дискриминативность \\
+\hline
+Hornik (1991) & Ограниченная, непостоянная & $L^p(\mu)$ & Дискриминативность \\
+\hline
+Hornik et al. (1990) & $C^m$, ограниченные производные & $C^m(\mathbb{R}^k)$ & $l$-конечность \\
+\hline
+LLPS (1993) & Локально ограниченная, кусочно непрерывная & $C(\mathbb{R}^n)$ & Не полиномиальность \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Заключительные наблюдения}
+
+Представленные теоремы демонстрируют эволюцию понимания универсальных аппроксимационных свойств нейронных сетей:
+
+\begin{enumerate}
+    \item \textbf{Cybenko (1989):} Показал, что непрерывные сигмоидальные функции обеспечивают плотность в $C(K)$.
+    \item \textbf{Hornik (1991):} Существенно ослабил условия --- достаточно ограниченности и непостоянности для плотности в $L^p(\mu)$.
+    \item \textbf{Hornik-Stinchcombe-White (1990):} Расширили результаты на случай одновременной аппроксимации функции и её производных.
+    \item \textbf{Leshno-Lin-Pinkus-Schocken (1993):} Дали полную характеризацию: неполиномиальность является \textbf{необходимым и достаточным} условием универсальной аппроксимации.
+\end{enumerate}
+
+Все доказательства используют единую схему: разделение функционалом, представление мерой, анализ аннулирующих свойств через преобразование Фурье и теорию распределений.
+
+\textbf{Основные техники доказательств:}
+\begin{itemize}
+    \item Функциональный анализ (терема Хана-Банаха, теоремы о представлении)
+    \item Гармонический анализ (преобразование Фурье, теорема Таубера-Винера)
+    \item Теория распределений (обобщенные производные)
+    \item Теорема Бэра о категории
+\end{itemize}
+
+\begin{remarks}
+    \leavevmode
+    \begin{itemize}
+        \item Условия на $\sigma$ в теореме LLPS минимальны: достаточно \textbf{неполиномиальности}.
+        \item Теорема Хорника (1991) обобщает результаты Cybenko (1989), снимая требование сигмоидальности.
+        \item Гладкая аппроксимация требует дополнительной гладкости $\sigma$, но не обязательной монотонности или ограниченности производных на всей прямой.
+        \item Все доказательства используют единую схему: разделение функционалом, представление мерой, доказательство дискриминаторности.
+    \end{itemize}
+\end{remarks}
+
+\end{document}

@@ -1,0 +1,83 @@
+\documentclass[../NDCNNAI_main.tex]{subfiles}
+\graphicspath{{\subfix{../fig/}}}
+
+\begin{document}
+\subsection{N-функции, модуль и норма Люксембурга}
+
+\begin{definition}[N-функция, Young function]
+Функция $\theta\colon\mathbb{R}\to[0,+\infty], \theta(0)=0$ такая, 
+что она выпуклая, полунепрерывная снизу, чётная, называется N-функцией.
+\end{definition}
+
+Например, N-функциями являются:
+\begin{itemize}
+    \item $\theta_p(s)=\frac{|s|^p}{p} \text{ при }p>1;$ 
+    \item $\theta(s)=e^{|s|}-1.$
+\end{itemize}
+
+\begin{definition}[Модуль Люксембурга]
+Для измеримой функции $f$, заданной на некотором множестве с мерой $(\Omega, \mu)$, 
+модуль Люксембурга (ассоциированный с N-функцией $\theta$)
+определяется как:
+$$\rho_\theta(f)=\int_\Omega\theta(|f(x)|)d\mu(x).$$
+\end{definition}
+
+\begin{definition}[Норма Люксембурга]
+Под нормой Люксембурга понимается величина:
+$$||f||_\theta=\inf\{\lambda>0\colon\rho_\theta\left(\frac{f}{\lambda}\right)\le1\}.$$
+\end{definition}
+
+\begin{remark}
+Определение корректно, норма Люксембурга действительно является нормой.
+\end{remark}
+
+\subsection{Пространства Орлича}
+$(\Omega, \mu)$ --- множество с мерой.
+
+\begin{definition}[Пространство Орлича]
+Пространством Орлича $L_\theta(\mu)$ называется множество измеримых функций $f$, 
+для которых выполняется $||f||_\theta<\infty$.
+\end{definition}
+
+\begin{remark}
+Некоторые операторы (например, максимальный оператор Харди-Литтлвуда) не ограничены в $L^1$, но ограничены в $L\log^+L$. Это мотивирует выйти за пределы $L^p$, что позволяют делать пространства Орлича с помощью N-функций.
+\end{remark}
+
+Примеры пространств Орлича:
+\begin{itemize}
+    \item Если $\theta(s)=\frac{|s|^p}{p}\text{ при }p>1$, то $L_\theta(\mu)=L^p$.
+    \item Если $e^{|s|}-1$, то полученное пространство называется экспоненциальным классом Орлича.
+    Возникает в теории вложений Соболева и анализе,
+    когда $L^p$-оценок недостаточно (например, соболева функция на $n$-мерной области принадлежит экспоненциальному классу Орлича).
+\end{itemize}
+
+\subsection{Обобщённые (Musielak–Orlicz) пространства Орлича}
+
+\begin{definition}[Обобщённая N-функция]
+Обобщённая N-функция --- это функция 
+$$\Phi\colon\Omega \times\mathbb{R}\to[0,\infty]$$
+такая, что:
+    \begin{enumerate}
+        \item $\Phi(x,\cdot)$ --- N-функция почти всюду для $x\in\Omega$;
+        \item Для каждого $t\ge0$ функция $x\mapsto\Phi(x,t)$ --- измерима.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Обобщённое пространство Орлича]
+Обобщённым пространством Орлича называется множество измеримых функций $f$, для которых $\exists\lambda>0$ $\int_\Omega\Phi(x,\frac{f(x)}{\lambda})d\mu(x)<\infty$.
+\end{definition}
+
+\begin{remark}
+В пространствах Орлича функция $\theta(s)$ имеет однородный рост по всей области.
+Обобщённые пространства Орлича позволяют работать с функциями переменного роста,
+что позволяет получить, например, переменные пространства Лебега.
+\end{remark}
+
+Примеры обобщённых пространств Орлича:
+\begin{itemize}
+    \item $\Phi(x,t)=\theta(t)\Longrightarrow$ Пространство Орлича;
+    \item $\Phi(x,t)=|t|^{p(x)}\Longrightarrow$ Переменное пространство Лебега $(L^{p(\cdot)})$;
+    \item $\Phi(x,t)=w(x)|t|^{p}\Longrightarrow$ Взвешенное пространство Лебега $(L^p(w))$.
+\end{itemize}
+
+\end{document}

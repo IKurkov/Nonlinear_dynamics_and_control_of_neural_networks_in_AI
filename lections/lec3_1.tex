@@ -1,0 +1,299 @@
+\documentclass[../NDCNNAI_main.tex]{subfiles}
+\graphicspath{{\subfix{../fig/}}}
+
+\begin{document}
+
+\subsection{Предварительные сведения: компактность, функции Таубера--Винера и активации}
+
+\textbf{Компактность и компактно-открытая топология:}
+Пусть \(X\) --- банахово пространство над \(\mathbb{R}\) (или \(\mathbb{C}\)) с нормой \(\|\cdot\|_X\).
+Для компактного \(K\subset X\) обозначим через \(C(K)\) пространство непрерывных функций \(u:K\to\mathbb{R}\)
+(или \(\mathbb{C}\)) с нормой
+\[
+\|u\|_{C(K)} \coloneq \sup_{x\in K}|u(x)|.
+\]
+Эту же норму часто называют \emph{равномерной нормой}.
+
+\textbf{Компактность в банаховом пространстве:}
+Поскольку любое банахово пространство метризуемо, компактность эквивалентна секвенциальной компактности.
+Кроме того, множество \(A\subset X\) \emph{относительно компактно} тогда и только тогда,
+когда оно \emph{сверхограничено} (для любого \(\varepsilon>0\) покрывается конечным числом \(\varepsilon\)-шаров),
+а его замыкание полно.
+
+\textbf{Компактно-открытая топология (локально равномерная сходимость):}
+На \(C(\mathbb{R}^n)\) рассматриваем топологию равномерной сходимости на компактах.
+Положим \(K_k=[-k,k]^n\). Тогда
+\[
+d(f,g)\coloneq\sum_{k=1}^\infty 2^{-k}\,
+\frac{\|(f-g)\mathbf{1}_{K_k}\|_\infty}{1+\|(f-g)\mathbf{1}_{K_k}\|_\infty}
+\]
+метризует компактно-открытую топологию; в частности,
+\(f_m\to f\) в этой метрике тогда и только тогда, когда
+\(\|f_m-f\|_{C(K)}\to 0\) для любого компакта \(K\subset\mathbb{R}^n\).
+
+\begin{definition}[Пространство Шварца]\label{def:schwartz}
+\emph{Пространство Шварца} \(\mathcal{S}(\mathbb{R}^n)\) --- это множество гладких функций
+\(\varphi\in C^\infty(\mathbb{R}^n)\), которые вместе со всеми производными убывают быстрее любой степени:
+для любых мультииндексов \(\alpha,\beta\) конечна полунорма
+\[
+p_{\alpha,\beta}(\varphi)\coloneq\sup_{x\in\mathbb{R}^n}\bigl|x^\alpha\,\partial^\beta \varphi(x)\bigr|<\infty.
+\]
+Эквивалентно: \(\varphi\) и все \(\partial^\beta\varphi\) имеют \emph{быстрое убывание} на бесконечности.
+\end{definition}
+
+\begin{definition}[Умеренные распределения]\label{def:tempered_simple}
+\emph{Пространство умеренных распределений} \(\mathcal{S}'(\mathbb{R}^n)\) определяется как
+\emph{двойственное} к \(\mathcal{S}(\mathbb{R}^n)\):
+\[
+\mathcal{S}'(\mathbb{R}^n)\coloneq\bigl(\mathcal{S}(\mathbb{R}^n)\bigr)^*.
+\]
+То есть элемент \(T\in\mathcal{S}'(\mathbb{R}^n)\) --- линейный функционал \(T:\mathcal{S}(\mathbb{R}^n)\to\mathbb{R}\),
+непрерывный в стандартной топологии пространства Шварца: существуют конечный набор \((\alpha_k,\beta_k)\) и \(C>0\), что
+\[
+|\langle T,\varphi\rangle| \le C\sum_{k=1}^m
+\sup_{x\in\mathbb{R}^n}\bigl|x^{\alpha_k}\partial^{\beta_k}\varphi(x)\bigr|
+\qquad \forall\,\varphi\in\mathcal{S}(\mathbb{R}^n).
+\]
+Сходимость \(T_\ell\to T\) в \(\mathcal{S}'\) означает \(\langle T_\ell,\varphi\rangle\to \langle T,\varphi\rangle\) для всех \(\varphi\in\mathcal{S}\) (поточечная или слабая сходимость).
+\end{definition}
+
+\textbf{Тестовые функции и распределения:}
+Пусть \(C_0^\infty(\mathbb{R}^n)\) --- пространство \emph{тестовых функций} (гладких с компактным носителем).
+Тогда \(\mathcal{D}'(\mathbb{R}^n)\coloneq(C_0^\infty(\mathbb{R}^n))'\) называется \emph{пространством распределений}
+(т.е. непрерывным двойственным к \(C_0^\infty\)).
+
+\begin{example}
+Некоторые классические вложения:
+\begin{itemize}
+  \item Если \(f\in L^1_{\mathrm{loc}}(\mathbb R^n)\) и \(f\) имеет полиномиальный рост, т.е.
+\[
+\exists\,m\in\mathbb N,\ \exists\,C>0:\quad |f(x)|\le C(1+\|x\|)^m\ \text{п.в.},
+\]
+то формула \(\langle T_f,\varphi\rangle=\int_{\mathbb R^n} f(x)\varphi(x)\,dx\) задаёт элемент
+\(T_f\in\mathcal S'(\mathbb R^n)\).
+  \item Конечные борелевские меры \(\mu\) задают \(T_\mu(\varphi)=\int \varphi\,d\mu\); это распределения порядка \(0\).
+  \item Дельта-функция Дирака \(\delta_{x_0}\in \mathcal{S}'\) и её производные:
+  \(\langle \partial^\alpha\delta_{x_0},\varphi\rangle = (-1)^{|\alpha|}\partial^\alpha\varphi(x_0)\).
+\end{itemize}
+\end{example}
+
+Отметим, какие операции определены в \(\mathcal{S}'\), для \(T\in\mathcal{S}'\), \(\varphi\in\mathcal{S}\):
+\[
+\langle \partial^\alpha T,\varphi\rangle \coloneq (-1)^{|\alpha|}\langle T,\partial^\alpha\varphi\rangle,
+\qquad
+\langle x^\beta T,\varphi\rangle \coloneq \langle T,x^\beta\varphi\rangle,
+\]
+а свёртка с тестовой функцией \((T*\varphi)(x)\coloneq\langle T, \varphi(x-\cdot)\rangle\) даёт гладкую функцию.
+Так же нам полезно научиться сглаживать функции, сделать это можно, например, так:
+пусть \(\eta\in C_0^\infty(\mathbb R)\), \(\eta\ge 0\), \(\int_{\mathbb R}\eta(x)\,dx=1\) и
+\(\eta_\varepsilon(x)\coloneq\varepsilon^{-1}\eta(x/\varepsilon)\).
+Для \(g\in L^1_{\mathrm{loc}}(\mathbb R)\) (или, шире, \(g\in\mathcal S'(\mathbb R)\)) определим сглаживание
+\(g_\varepsilon\coloneq g*\eta_\varepsilon\).
+Тогда \(g_\varepsilon\in C^\infty(\mathbb R)\), а при \(\varepsilon\downarrow 0\) имеем \(g_\varepsilon\to g\) в смысле распределений.
+
+\begin{remark}
+В доказательствах критериев TW (через Хана-Банаха, меры Рисса и преобразование Фурье в \(\mathcal S'\))
+удобно иметь дело с объектами, к которым корректно применяется аппарат \(\mathcal S/\mathcal S'\).
+Именно поэтому полезно рассматривать классы функций с умеренным ростом.
+\end{remark}
+
+На \(\mathcal{S}(\mathbb{R}^n)\) определяем преобразование Фурье:
+\[
+\widehat{\varphi}(\xi)=\int_{\mathbb{R}^n}\varphi(x)e^{-i\xi\cdot x}\,dx,
+\qquad
+\varphi(x)=\frac{1}{(2\pi)^n}\int_{\mathbb{R}^n}\widehat{\varphi}(\xi)e^{i\xi\cdot x}\,d\xi,
+\]
+и продолжаем на \(\mathcal{S}'\) по правилу
+\[
+\langle \widehat{T},\varphi\rangle \coloneq \langle T,\widehat{\varphi}\rangle,
+\qquad \varphi\in\mathcal{S}.
+\]
+Отметим, что это топологический автоморфизм \(\mathcal{S}'\to\mathcal{S}'\).
+
+\subsection*{Компактность в \textit{C(K)}: критерий Арцела-Асколи}
+
+\begin{theorem}[Арцела--Асколи для \(C(K)\)]\label{thm:AA}
+Пусть \(K\) --- компактное метрическое пространство.
+Множество \(V\subset C(K)\) относительно компактно
+тогда и только тогда, когда:
+\begin{enumerate}
+  \item \(V\) равномерно ограничено: \(\sup_{u\in V}\|u\|_{C(K)}<\infty\);
+  \item \(V\) равностепенно непрерывно: для любого \(\varepsilon>0\) существует \(\delta>0\), что
+  \(|u(x)-u(y)|<\varepsilon\) для всех \(u\in V\) при \(d(x,y)<\delta\).
+\end{enumerate}
+Более того, для компактного \(V\) существует общий модуль непрерывности \(\omega_V(\cdot)\to 0\),
+такой что \(|u(x)-u(y)|\le \omega_V(d(x,y))\) для всех \(u\in V\).
+\end{theorem}
+
+\begin{remark}
+В дальнейших конструкциях (аппроксимация по выборкам) ключевым является именно \emph{общий} модуль \(\omega_V\):
+он позволяет выбрать сетку и разбиение единицы, которые работают \emph{одновременно} для всех \(u\in V\).
+\end{remark}
+
+\subsection*{\(\delta\)-сети, разбиения единицы и конечномерные операторы выборки}
+
+Пусть \(K\) --- компактное метрическое пространство.
+
+\begin{definition}[\(\delta\)-сеть]
+Множество \(N(\delta)=\{x_1,\dots,x_m\}\subset K\) называется \(\delta\)-сетью, если
+\(K\subset \bigcup_{j=1}^m B(x_j,\delta)\).
+\end{definition}
+
+\begin{proposition}[Разбиение единицы, подчинённое \(\delta\)-сети]\label{prop:pou}
+Для любого \(\delta>0\) существует непрерывное разбиение единицы \(\{\tau_j\}_{j=1}^m\subset C(K)\),
+такое что \(\sum_{j=1}^m\tau_j(x)=1\) на \(K\) и \(\mathrm{supp}\,\tau_j\subset B(x_j,\delta)\).
+\end{proposition}
+
+Фиксируем \(\delta\)-сеть и \(\{\tau_j\}\), определим \emph{оператор выборки} (ранга \(\le m\)):
+\begin{equation}\label{eq:sampling}
+(\Pi_\delta u)(x)\coloneq\sum_{j=1}^m u(x_j)\,\tau_j(x), \qquad u\in C(K). \tag{\(\star\)}
+\end{equation}
+
+\begin{lemma}[Оценка ошибки по модулю непрерывности]\label{lem:sampling_error}
+Если \(V\subset C(K)\) равностепенно непрерывно с модулем \(\omega_V\), то для любого \(u\in V\)
+\[
+\|u-\Pi_\delta u\|_{C(K)} \le \omega_V(\delta).
+\]
+В частности, при \(\delta\to 0\) получаем \(\sup_{u\in V}\|u-\Pi_\delta u\|_{C(K)}\to 0\).
+\end{lemma}
+
+\begin{proof}
+Для \(x\in K\):
+\[
+u(x)-(\Pi_\delta u)(x)=\sum_{j=1}^m\bigl(u(x)-u(x_j)\bigr)\tau_j(x).
+\]
+Если \(\tau_j(x)\neq 0\), то \(x\in \mathrm{supp}\,\tau_j\subset B(x_j,\delta)\), значит \(|u(x)-u(x_j)|\le \omega_V(\delta)\).
+Поэтому
+\[
+|u(x)-(\Pi_\delta u)(x)|
+\le \sum_{j=1}^m \omega_V(\delta)\tau_j(x)
+=\omega_V(\delta)\sum_{j=1}^m\tau_j(x)
+=\omega_V(\delta).
+\]
+Берём супремум по \(x\in K\).
+\end{proof}
+
+\subsection*{Функции сигмоидальные и Таубера--Винера, дискриминаторность}
+
+\begin{definition}[Сигмоидальная функция]\label{def:sigmoid}
+Функция \(\sigma\colon\mathbb{R}\to\mathbb{R}\) называется \emph{сигмоидальной}, если
+\[
+\lim_{x\to-\infty}\sigma(x)=0,\qquad \lim_{x\to+\infty}\sigma(x)=1.
+\]
+\end{definition}
+
+\begin{definition}[Функция Таубера--Винера]\label{def:TW}
+Функция \(g\colon\mathbb{R}\to\mathbb{R}\) называется \emph{функцией Таубера-Винера} (TW),
+если для любого отрезка \([a,b]\subset\mathbb{R}\) линейная оболочка
+\[
+\mathrm{span}\{\, g(\lambda x+\theta)\colon \lambda\in\mathbb{R}\setminus\{0\},\ \theta\in\mathbb{R}\,\}
+\]
+плотна в \(C[a,b]\) по равномерной норме \(\|\cdot\|_{C[a,b]}\).
+\end{definition}
+
+\textbf{Дискриминаторная активация:}
+В схеме Цыбенко--Хорника используют следующее свойство:
+если конечная борелевская мера со знаком (заряд) \(\mu\) на \([a,b]\) удовлетворяет
+\(\int_{[a,b]} g(\lambda x+\theta)\,d\mu(x)=0\) для всех \(\lambda\ne 0\), \(\theta\in\mathbb R\),
+то \(\mu=0\).
+Такую активацию называют \emph{дискриминаторной} (discriminatory).
+
+\subsection{Критерий <<TW \(\Leftrightarrow\) неполиномиальность>> в \(\mathcal{S}'(\mathbb{R})\)}
+
+\begin{theorem}[Чен и Чен, TW \(\Leftrightarrow\) неполиномиальность]\label{thm:TW_nonpoly}
+Пусть \(g\in C(\mathbb{R})\cap \mathcal{S}'(\mathbb{R})\).
+Тогда \(g\) является TW-функцией тогда и только тогда, когда \(g\) не является полиномом.
+\end{theorem}
+
+\begin{proof}
+\emph{(Полином \(\Rightarrow\) не TW).}
+Если \(g\) --- полином степени \(\le q\), то для любых \(\lambda\ne 0\), \(\theta\in\mathbb R\)
+функция \(x\mapsto g(\lambda x+\theta)\) также является полиномом степени \(\le q\).
+Следовательно,
+\(\mathrm{span}\{g(\lambda x+\theta)\}\subset \mathcal P_q\),
+где \(\mathcal P_q\) --- конечномерное пространство полиномов степени \(\le q\).
+Но \(\mathcal P_q\) не может быть плотным в бесконечномерном \(C[a,b]\), значит \(g\) не TW.
+
+\medskip
+\emph{(Не TW \(\Rightarrow\) полином).}
+Пусть \(g\in C(\mathbb R)\cap \mathcal S'(\mathbb R)\) и предположим, что \(g\) не является TW-функцией.
+Тогда существует отрезок \([a,b]\), на котором замкнутая линейная оболочка
+\[
+\mathcal L\coloneq\overline{\mathrm{span}\{g(\lambda x+\theta):\lambda\ne 0,\ \theta\in\mathbb R\}}
+\subset C[a,b]
+\]
+не совпадает с \(C[a,b]\).
+По теореме Хана-Банаха существует ненулевой функционал \(F\in (C[a,b])^*\) такой, что \(F|_{\mathcal{L}}\equiv 0\).
+По теореме Рисса существует ненулевая конечная подписанная борелевская мера \(\rho\) на \([a,b]\), что
+\[
+F(f)=\int_{[a,b]} f(x)\,d\rho(x), \qquad f\in C[a,b],
+\]
+и, в частности,
+\begin{equation}\label{eq:annihilate_proof}
+\int_{[a,b]} g(\lambda x+\theta)\,d\rho(x)=0
+\qquad \forall\,\lambda\ne 0,\ \forall\,\theta\in\mathbb R.
+\end{equation}
+Продлим \(\rho\) нулём вне \([a,b]\), рассматривая её как конечную меру на \(\mathbb R\).
+
+\medskip
+\emph{Шаг 1: распределение по \(\theta\) и Фурье по \(\theta\).}
+Зафиксируем \(\lambda\ne 0\) и рассмотрим распределение по переменной \(\theta\):
+\[
+F_\lambda(\theta)\coloneq\int_{\mathbb R} g(\lambda x+\theta)\,d\rho(x).
+\]
+Равенство \eqref{eq:annihilate_proof} означает \(F_\lambda\equiv 0\) (как распределение).
+Возьмём преобразование Фурье по \(\theta\). Формально
+\[
+\mathcal F_\theta[g(\lambda x+\theta)](t)=e^{-it\lambda x}\,\widehat g(t),
+\]
+поэтому
+\[
+\widehat{F_\lambda}(t)=\widehat g(t)\,\widehat\rho(\lambda t).
+\]
+Так как \(F_\lambda\equiv 0\), то \(\widehat{F_\lambda}\equiv 0\), и мы получаем тождество в \(\mathcal S'(\mathbb R)\):
+\begin{equation}\label{eq:product_proof}
+\widehat g(t)\,\widehat\rho(\lambda t)=0
+\qquad \text{для всех }\lambda\ne 0.
+\end{equation}
+
+\medskip
+\emph{Шаг 2: корректность произведения.}
+Пусть \(\omega\in\mathcal S(\mathbb R)\). Так как \(\mathrm{supp}(\rho)\subset[a,b]\), функция \(\widehat\rho\) гладкая и ограниченная
+(и то же верно для всех её производных), поэтому \(\omega(\cdot)\widehat\rho(\lambda\cdot)\in\mathcal S(\mathbb R)\).
+Следовательно, выражение \(\langle \widehat g,\omega(\cdot)\widehat\rho(\lambda\cdot)\rangle\) корректно,
+и равенство \eqref{eq:product_proof} понимается именно как равенство в смысле распределений.
+
+\medskip
+\emph{Шаг 3: вывод \(\mathrm{supp}(\widehat g)\subset\{0\}\).}
+Так как \(\rho\neq 0\), её Фурье-образ \(\widehat\rho\) не тождественно равен нулю, значит существует \(t_0\neq 0\), что \(\widehat\rho(t_0)\neq 0\).
+По непрерывности \(\widehat\rho\) найдётся \(\delta>0\), для которой \(\widehat\rho(t)\neq 0\) при \(t\in(t_0-\delta,t_0+\delta)\).
+
+Пусть \(t_1\neq 0\) произвольно. Положим \(\lambda\coloneq t_0/t_1\).
+Тогда \(\widehat\rho(\lambda t)\neq 0\) в некоторой окрестности точки \(t=t_1\).
+Возьмём \(\psi\in C_0^\infty(\mathbb R)\) с носителем внутри этой окрестности и положим
+\[
+\omega(t)\coloneq\frac{\psi(t)}{\widehat\rho(\lambda t)}.
+\]
+Тогда \(\omega\in C_0^\infty(\mathbb R)\subset\mathcal S(\mathbb R)\), и подстановка в \eqref{eq:product_proof} даёт
+\[
+0=\langle \widehat g,\,\omega(\cdot)\widehat\rho(\lambda\cdot)\rangle
+=\langle \widehat g,\,\psi\rangle.
+\]
+Следовательно \(t_1\notin \mathrm{supp}(\widehat g)\). Так как \(t_1\neq 0\) произвольно, получаем \(\mathrm{supp}(\widehat g)\subset\{0\}\).
+
+\medskip
+\emph{Шаг 4: распределение с носителем в точке \(\Rightarrow\) полином.}
+Если \(T\in\mathcal S'(\mathbb R)\) и \(\mathrm{supp}(T)\subset\{0\}\), то \(T\) является конечной линейной комбинацией \(\delta\) и её производных.
+Применяя это к \(T=\widehat g\) и затем обратное преобразование Фурье в \(\mathcal S'\),
+получаем, что \(g\) является полиномом.
+
+Таким образом, из предположения “\(g\) не TW” следует “\(g\) полином”.
+Контрапозиция даёт: если \(g\) не полином, то \(g\) TW.
+\end{proof}
+
+\begin{remark}
+Смысл \hyperref[thm:TW_nonpoly]{теоремы}: при условиях \(g\in C(\mathbb R)\cap\mathcal S'(\mathbb R)\)
+единственное препятствие для TW-свойства --- полиномиальность; это даёт простой критерий <<пригодности>> активации.
+\end{remark}
+
+\end{document}
